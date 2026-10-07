@@ -43,7 +43,7 @@ Pembuatan database `kopma_123` serta konfigurasi user `wulan_087` dengan hak aks
 Saya menyatakan bahwa penggunaan AI pada laporan ini digunakan sebagai panduan format, pengecekan sintaks SQL, serta penyusunan struktur teks laporan.
 
 ## 10. Bukti Git
-* [Tautan Repositori GitHub](https://github.com/username/repositori) + `hash commit: abc1234`
+* [Tautan Repositori GitHub](https://github.com/wulann10/basisdata-25430087/blob/main/laporan/p01_laporan_087.md)
 
 ## Checklist
 - [x] Kerangka laporan sesuai dengan format buku panduan
