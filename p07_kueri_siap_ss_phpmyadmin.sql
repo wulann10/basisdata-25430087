@@ -4,195 +4,27 @@
 -- 
 -- Mahasiswa : Wulan Maghfiroh (NIM 25430087)
 -- Basis Data: kopma_087
--- Petunjuk  : 
--- 1. Buka phpMyAdmin di browser (http://localhost/phpmyadmin).
--- 2. Klik basis data `kopma_087` di panel sebelah kiri.
--- 3. Masuk ke tab "SQL".
--- 4. Salin kueri di bawah ini satu per satu sesuai nomor screenshot (1 s.d 23).
--- 5. Jalankan (klik tombol "Kirim" / "Go").
--- 6. Tangkap layar (Win + Shift + S) seluruh hasil query + pesan status.
--- 7. Simpan file gambar ke dalam folder `img7/` (dan `laporan/img7/`) dengan nama:
---    1.png, 2.png, 3.png, ... sampai 23.png.
+-- Total SS  : Cukup 10 Screenshot (1.png sampai 10.png)
+-- Lokasi SS : Simpan langsung ke folder: laporan\img7\
+-- 
+-- Petunjuk Praktis:
+-- 1. Buka phpMyAdmin di browser: http://localhost/phpmyadmin
+-- 2. Klik nama basis data `kopma_087` di panel sebelah kiri.
+-- 3. Masuk ke tab "SQL" di bagian atas.
+-- 4. Salin salah satu kueri di bawah ini (Kueri 01 s.d 10).
+-- 5. Klik tombol "Kirim" / "Go" di kanan bawah.
+-- 6. Tekan tombol Windows: Win + Shift + S untuk menangkap layar (screenshot).
+--    Pastikan teks kueri dan tabel hasil yang keluar ikut tertangkap.
+-- 7. Simpan file gambar ke folder `laporan\img7\` dengan nama:
+--    1.png, 2.png, 3.png, ... sampai 10.png.
 -- ============================================================================
 
 USE kopma_087;
 
--- ============================================================================
--- BAGIAN 1: LANGKAH PERCOBAAN D & LATIHAN E (1.png s.d 11.png)
--- ============================================================================
-
 -- ----------------------------------------------------------------------------
--- [1.png] D.1 Kueri KI-03: Peringatan Barang di Bawah Stok Minimum
--- Deskripsi: Menampilkan barang yang perlu dipesan ulang beserta defisitnya
--- Hasil phpMyAdmin: 1 baris (MKN-005, Cokelat Silverqueen, stok 3, min 5, kurang 2)
--- ----------------------------------------------------------------------------
-SELECT kode_barang, 
-       nama_barang, 
-       stok_barang, 
-       stok_min_barang, 
-       stok_min_barang - stok_barang AS kurang
-FROM barang
-WHERE stok_barang < stok_min_barang
-ORDER BY kurang DESC;
-
-
--- ----------------------------------------------------------------------------
--- [2.png] D.1 Kueri Penyaringan IN: Kategori ATK dan Minuman
--- Deskripsi: Menyaring himpunan nilai diskrit khusus kategori ATK dan minuman
--- Hasil phpMyAdmin: 10 baris produk (6 ATK dan 4 minuman)
--- ----------------------------------------------------------------------------
-SELECT kode_barang, 
-       nama_barang, 
-       kategori_barang, 
-       harga_jual_barang, 
-       stok_barang
-FROM barang
-WHERE kategori_barang IN ('ATK', 'minuman')
-ORDER BY kategori_barang ASC, nama_barang ASC;
-
-
--- ----------------------------------------------------------------------------
--- [3.png] D.1 Kueri Penyaringan BETWEEN: Transaksi Kasir 24 September 2026
--- Deskripsi: Menyaring rentang waktu transaksi shift harian
--- Hasil phpMyAdmin: 10 baris pertama transaksi nota pada tanggal 24-09-2026
--- ----------------------------------------------------------------------------
-SELECT no_nota_penjualan, 
-       tgl_penjualan, 
-       total_belanja, 
-       bayar_penjualan
-FROM penjualan
-WHERE tgl_penjualan BETWEEN '2026-09-24 00:00:00' AND '2026-09-24 23:59:59'
-ORDER BY tgl_penjualan ASC
-LIMIT 10;
-
-
--- ----------------------------------------------------------------------------
--- [4.png] D.1 Kueri Penyaringan IS NULL: Anggota Tanpa Nomor Kontak HP
--- Deskripsi: Menemukan anggota yang data nomor teleponnya bernilai NULL
--- Hasil phpMyAdmin: 1 baris anggota (Rizky Pratama, NIM 25430012, telepon NULL)
--- ----------------------------------------------------------------------------
-SELECT nim_anggota, 
-       nama_anggota, 
-       jenis_kelamin, 
-       status_anggota, 
-       telepon_anggota
-FROM anggota
-WHERE telepon_anggota IS NULL;
-
-
--- ----------------------------------------------------------------------------
--- [5.png] Titik Analisis 1: Demonstrasi Galat ERROR 1054 Alias di WHERE
--- Deskripsi: Kueri ini SENGAJA memicu galat untuk membuktikan urutan evaluasi logis SQL
--- Hasil phpMyAdmin: Kotak pesan merah galat: #1054 - Unknown column 'kurang' in 'where clause'
--- ----------------------------------------------------------------------------
-SELECT kode_barang, 
-       nama_barang, 
-       stok_barang, 
-       stok_min_barang, 
-       stok_min_barang - stok_barang AS kurang
-FROM barang
-WHERE kurang > 0;
-
-
--- ----------------------------------------------------------------------------
--- [6.png] D.2 Pola Teks LIKE, CONCAT, IFNULL, dan CASE
--- Deskripsi: Menguji fungsi penggabungan nama, tanggal Indonesia, IFNULL, & CASE diskon
--- Hasil phpMyAdmin: 5 baris anggota teratas yang namanya memuat huruf 'a'
--- ----------------------------------------------------------------------------
-SELECT CONCAT(nama_anggota, ' (', nim_anggota, ')') AS anggota,
-       DATE_FORMAT(tgl_daftar, '%d-%m-%Y') AS tgl_daftar_anggota,
-       IFNULL(telepon_anggota, '-') AS hp,
-       CASE status_anggota 
-           WHEN 'aktif' THEN 'Diskon 5%'
-           ELSE 'Tanpa diskon' 
-       END AS keterangan
-FROM anggota
-WHERE nama_anggota LIKE '%a%'
-ORDER BY tgl_daftar DESC
-LIMIT 5;
-
-
--- ----------------------------------------------------------------------------
--- [7.png] Titik Analisis 2: Pembuktian Three-Valued Logic (WHERE col = NULL)
--- Deskripsi: SENGAJA menguji pembanding '= NULL' yang menghasilkan status UNKNOWN
--- Hasil phpMyAdmin: Kotak hijau 'MySQL menyatakan set hasil kosong (misal 0 baris)'
--- ----------------------------------------------------------------------------
-SELECT nim_anggota, 
-       nama_anggota, 
-       telepon_anggota
-FROM anggota
-WHERE telepon_anggota = NULL;
-
-
--- ----------------------------------------------------------------------------
--- [8.png] D.3 Perhitungan Tanggal: Umur Keanggotaan DATEDIFF & Status Baru/Lama
--- Deskripsi: Menghitung selisih hari pendaftaran hingga saat ini dan label status
--- Hasil phpMyAdmin: 11 baris anggota dengan kolom lama_hari dan status 'Lama'
--- ----------------------------------------------------------------------------
-SELECT nim_anggota, 
-       nama_anggota, 
-       tgl_daftar, 
-       DATEDIFF(CURDATE(), tgl_daftar) AS lama_hari,
-       CASE 
-           WHEN DATEDIFF(CURDATE(), tgl_daftar) < 180 THEN 'Baru'
-           ELSE 'Lama'
-       END AS status_keanggotaan
-FROM anggota
-ORDER BY tgl_daftar DESC;
-
-
--- ----------------------------------------------------------------------------
--- [9.png] D.3 Perhitungan per Baris: Rincian Subtotal Item Nota PJ-2609-0142
--- Deskripsi: Perkalian skalar (qty * harga_satuan) yang cocok dengan fisik nota Modul 2
--- Hasil phpMyAdmin: 3 baris item belanja (subtotal Rp12.000, Rp13.000, Rp4.000)
--- ----------------------------------------------------------------------------
-SELECT d.id_penjualan, 
-       d.id_barang, 
-       d.qty_detail_penjualan AS qty, 
-       d.harga_satuan_detail_penjualan AS harga_satuan, 
-       (d.qty_detail_penjualan * d.harga_satuan_detail_penjualan) AS subtotal
-FROM detail_penjualan d
-WHERE d.id_penjualan = (
-    SELECT id_penjualan 
-    FROM penjualan 
-    WHERE no_nota_penjualan = 'PJ-2609-0142'
-);
-
-
--- ----------------------------------------------------------------------------
--- [10.png] Latihan E.1: Format Teks Huruf Kapital & Format Rupiah Indonesia
--- Deskripsi: Menggunakan fungsi UPPER() dan FORMAT(harga, 0, 'id_ID')
--- Hasil phpMyAdmin: 10 baris katalog barang dengan tampilan huruf besar dan format Rp
--- ----------------------------------------------------------------------------
-SELECT UPPER(nama_barang) AS nama_barang_kapital,
-       CONCAT('Rp', FORMAT(harga_jual_barang, 0, 'id_ID')) AS harga_jual_format,
-       stok_barang
-FROM barang
-ORDER BY nama_barang ASC
-LIMIT 10;
-
-
--- ----------------------------------------------------------------------------
--- [11.png] Latihan E.2: Analisis Kesalahan Semantik Operator Logika OR vs AND
--- Deskripsi: Menunjukkan kesalahan semantik akibat ketiadaan tanda kurung presedensi
--- Hasil phpMyAdmin: 7 baris barang (Tip-Ex dan Penggaris salah lolos karena AND > OR)
--- ----------------------------------------------------------------------------
-SELECT kode_barang, 
-       nama_barang, 
-       kategori_barang, 
-       stok_barang
-FROM barang
-WHERE kategori_barang = 'ATK' OR kategori_barang = 'makanan' AND stok_barang > 50;
-
-
--- ============================================================================
--- BAGIAN 2: TUGAS MANDIRI MILESTONE PROYEK 7 (12.png s.d 23.png)
--- ============================================================================
-
--- ----------------------------------------------------------------------------
--- [12.png] Milestone Proyek 7 [Kueri 01 - KI-03]: Peringatan Restock Barang Kritis
--- Deskripsi: Menampilkan barang dengan stok fisik <= stok minimum
--- Hasil phpMyAdmin: 1 baris (MKN-005, Cokelat Silverqueen, defisit_stok 2)
+-- [1.png] Kueri 01 (KI-03): Peringatan Restock Barang Kritis di Bawah Batas Minimum
+-- Deskripsi       : Menampilkan barang yang stok fisiknya <= batas stok minimum
+-- Hasil phpMyAdmin: 1 baris (MKN-005, Cokelat Silverqueen, stok 3, min 5, defisit 2)
 -- ----------------------------------------------------------------------------
 SELECT kode_barang, 
        nama_barang, 
@@ -206,9 +38,9 @@ ORDER BY defisit_stok DESC;
 
 
 -- ----------------------------------------------------------------------------
--- [13.png] Milestone Proyek 7 [Kueri 02 - KI-03]: Filter IN Kategori & Format Harga Rupiah
--- Deskripsi: Saring kategori ATK/minuman berharga > 4000 dengan format mata uang
--- Hasil phpMyAdmin: 6 baris produk berformat 'Rp7.500', 'Rp6.500', dst.
+-- [2.png] Kueri 02 (KI-03): Filter Himpunan IN Kategori & Format Harga Rupiah
+-- Deskripsi       : Menyaring kategori ATK dan Minuman berharga > Rp4.000 dengan format Rp
+-- Hasil phpMyAdmin: 6 baris produk (Tip-Ex, Buku Tulis, Penggaris, Kopi, Susu, Teh Pucuk)
 -- ----------------------------------------------------------------------------
 SELECT kode_barang, 
        nama_barang, 
@@ -222,8 +54,8 @@ ORDER BY kategori_barang ASC, harga_jual_barang DESC;
 
 
 -- ----------------------------------------------------------------------------
--- [14.png] Milestone Proyek 7 [Kueri 03 - KI-01]: Pencarian Pola LIKE & CONCAT Label
--- Deskripsi: Cari anggota dengan nama berawalan 'A' atau mengandung 'Dewi'
+-- [3.png] Kueri 03 (KI-01): Pencarian Pola LIKE & Penggabungan Label CONCAT
+-- Deskripsi       : Mencari anggota berawalan huruf 'A' atau mengandung kata 'Dewi'
 -- Hasil phpMyAdmin: 2 baris anggota (Ahmad Fauzi & Citra Dewi Lestari)
 -- ----------------------------------------------------------------------------
 SELECT nim_anggota, 
@@ -238,9 +70,9 @@ ORDER BY nama_anggota ASC;
 
 
 -- ----------------------------------------------------------------------------
--- [15.png] Milestone Proyek 7 [Kueri 04 - KI-01]: Deteksi Kontak Kosong IS NULL & IFNULL
--- Deskripsi: Anggota yang belum mengisi nomor kontak disubstitusi teks 'BELUM MENGISI'
--- Hasil phpMyAdmin: 1 baris anggota (Rizky Pratama, status_kontak 'BELUM MENGISI')
+-- [4.png] Kueri 04 (KI-01): Deteksi Kontak Kosong IS NULL & Substitusi IFNULL
+-- Deskripsi       : Menemukan anggota tanpa nomor telepon dan diganti teks 'BELUM MENGISI'
+-- Hasil phpMyAdmin: 1 baris anggota (Rizky Pratama, NIM 25430012, status_kontak 'BELUM MENGISI')
 -- ----------------------------------------------------------------------------
 SELECT nim_anggota, 
        nama_anggota, 
@@ -252,9 +84,9 @@ WHERE telepon_anggota IS NULL;
 
 
 -- ----------------------------------------------------------------------------
--- [16.png] Milestone Proyek 7 [Kueri 05 - KI-02]: Filter Transaksi BETWEEN & Kembalian
--- Deskripsi: Rekapitulasi transaksi 24 September 2026 dan perhitungan selisih kembalian
--- Hasil phpMyAdmin: 10 baris transaksi dengan waktu format dd/mm/yyyy hh:mm
+-- [5.png] Kueri 05 (KI-02): Transaksi Shift Harian BETWEEN & Hitung Kembalian
+-- Deskripsi       : Menampilkan transaksi operasional shift tanggal 24 September 2026
+-- Hasil phpMyAdmin: 10 baris transaksi dengan format waktu dd/mm/yyyy hh:mm & uang kembali
 -- ----------------------------------------------------------------------------
 SELECT no_nota_penjualan, 
        DATE_FORMAT(tgl_penjualan, '%d/%m/%Y %H:%i') AS waktu_transaksi, 
@@ -268,8 +100,8 @@ LIMIT 10;
 
 
 -- ----------------------------------------------------------------------------
--- [17.png] Milestone Proyek 7 [Kueri 06 - KI-02]: Segmentasi Pelanggan Umum IS NULL Belanja > 30rb
--- Deskripsi: Mengidentifikasi pembeli non-anggota (id_anggota NULL) bernilai belanja besar
+-- [6.png] Kueri 06 (KI-02): Segmentasi Pelanggan Umum IS NULL Belanja > 30rb
+-- Deskripsi       : Mengidentifikasi transaksi belanja pembeli umum (non-anggota) bernilai besar
 -- Hasil phpMyAdmin: 7 baris transaksi dengan label 'Pelanggan Umum'
 -- ----------------------------------------------------------------------------
 SELECT no_nota_penjualan, 
@@ -285,9 +117,9 @@ ORDER BY total_belanja DESC;
 
 
 -- ----------------------------------------------------------------------------
--- [18.png] Milestone Proyek 7 [Kueri 07 - KI-02]: Klasifikasi Skala Nilai Belanja CASE WHEN
--- Deskripsi: Mengelompokkan transaksi menjadi 'Belanja Besar', 'Sedang', atau 'Ringan'
--- Hasil phpMyAdmin: 10 baris transaksi teratas dengan kolom kategori_transaksi
+-- [7.png] Kueri 07 (KI-02): Klasifikasi Skala Nilai Belanja dengan CASE WHEN
+-- Deskripsi       : Mengelompokkan transaksi ke skala 'Belanja Besar', 'Sedang', atau 'Ringan'
+-- Hasil phpMyAdmin: 10 baris nota kasir teratas dengan label kategori belanja dinamis
 -- ----------------------------------------------------------------------------
 SELECT no_nota_penjualan, 
        total_belanja, 
@@ -303,9 +135,9 @@ LIMIT 10;
 
 
 -- ----------------------------------------------------------------------------
--- [19.png] Milestone Proyek 7 [Kueri 08 - KI-01]: Analisis Usia DATEDIFF & Pengelompokan Senioritas
--- Deskripsi: Menghitung umur keanggotaan dalam hari dan label 'Senior' / 'Menengah'
--- Hasil phpMyAdmin: 11 baris anggota koperasi berurutan dari masa gabung terlama
+-- [8.png] Kueri 08 (KI-01): Analisis Usia Anggota DATEDIFF & Pengelompokan Senioritas
+-- Deskripsi       : Menghitung umur bergabung anggota dalam satuan hari dan label senioritas
+-- Hasil phpMyAdmin: 11 baris anggota koperasi dari masa keanggotaan terlama ke termuda
 -- ----------------------------------------------------------------------------
 SELECT nim_anggota, 
        nama_anggota, 
@@ -321,9 +153,9 @@ ORDER BY masa_gabung_hari DESC;
 
 
 -- ----------------------------------------------------------------------------
--- [20.png] Milestone Proyek 7 [Kueri 09 - KI-04]: Audit Mutasi Poin Loyalitas BETWEEN 2-5
--- Deskripsi: Menyaring mutasi perolehan poin loyalitas yang bernilai antara 2 hingga 5
--- Hasil phpMyAdmin: 10 baris mutasi perolehan poin teratas
+-- [9.png] Kueri 09 (KI-04): Audit Mutasi Poin Loyalitas BETWEEN 2-5
+-- Deskripsi       : Menyaring catatan audit mutasi poin perolehan belanja bernilai 2 s.d 5
+-- Hasil phpMyAdmin: 10 baris log mutasi poin perolehan dengan waktu format dd Mon yyyy hh:mm
 -- ----------------------------------------------------------------------------
 SELECT id_riwayat_poin, 
        id_anggota, 
@@ -339,9 +171,9 @@ LIMIT 10;
 
 
 -- ----------------------------------------------------------------------------
--- [21.png] Milestone Proyek 7 [Kueri 10 - KI-02]: Identifikasi Transaksi Dibayar Uang Pas
--- Deskripsi: Menemukan nota kasir di mana pembeli membayar dengan uang pas (kembalian 0)
--- Hasil phpMyAdmin: 3 baris transaksi nota dengan selisih_kembalian 0.00
+-- [10.png] Kueri 10 (KI-02): Identifikasi Transaksi Dibayar Uang Pas
+-- Deskripsi       : Menemukan nota kasir di mana pembeli membayar dengan uang pas (kembalian 0)
+-- Hasil phpMyAdmin: 3 baris transaksi penjualan dengan selisih_kembalian bernilai 0.00
 -- ----------------------------------------------------------------------------
 SELECT no_nota_penjualan, 
        tgl_penjualan, 
@@ -353,36 +185,6 @@ WHERE bayar_penjualan = total_belanja
 ORDER BY total_belanja DESC
 LIMIT 10;
 
-
--- ----------------------------------------------------------------------------
--- [22.png] Milestone Proyek 7 [Kueri 11 - KI-05]: Filter Mitra Rekanan Luar Surabaya NOT LIKE
--- Deskripsi: Menyaring pemasok yang alamatnya berada di luar kota Surabaya
--- Hasil phpMyAdmin: 3 baris mitra pemasok (Gresik, Sidoarjo, dan Pasuruan)
--- ----------------------------------------------------------------------------
-SELECT id_pemasok, 
-       nama_pemasok, 
-       telepon_pemasok, 
-       alamat_pemasok
-FROM pemasok
-WHERE alamat_pemasok NOT LIKE '%Surabaya%'
-ORDER BY nama_pemasok ASC;
-
-
--- ----------------------------------------------------------------------------
--- [23.png] Milestone Proyek 7 [Kueri 12 - KI-03 / KI-02]: Subtotal Item Belanja >= 15rb
--- Deskripsi: Menghitung rincian per baris item belanja dengan subtotal >= Rp15.000
--- Hasil phpMyAdmin: 10 baris item belanja bernilai tinggi teratas
--- ----------------------------------------------------------------------------
-SELECT id_penjualan, 
-       id_barang, 
-       qty_detail_penjualan AS kuantitas, 
-       harga_satuan_detail_penjualan AS harga_satuan, 
-       (qty_detail_penjualan * harga_satuan_detail_penjualan) AS subtotal_item
-FROM detail_penjualan
-WHERE (qty_detail_penjualan * harga_satuan_detail_penjualan) >= 15000
-ORDER BY subtotal_item DESC
-LIMIT 10;
-
 -- ============================================================================
--- AKHIR DARI PANDUAN KUERI p07_kueri_siap_ss_phpmyadmin.sql
+-- AKHIR DARI PANDUAN KUERI 10 SCREENSHOT (1.png s.d 10.png)
 -- ============================================================================
