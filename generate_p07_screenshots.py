@@ -207,3 +207,4 @@ for item in scenarios:
     render_screenshot(fname, title, sql, is_err, custom_err)
 
 print("All screenshots generated successfully!")
+

@@ -1,3 +1,4 @@
+
 -- ============================================================================
 -- SKRIP KUERI KOPMA - LANGKAH PERCOBAAN D & LATIHAN E (MODUL 07)
 -- Praktikum Basis Data: Menjawab Pertanyaan dengan SELECT dan Fungsi Skalar
